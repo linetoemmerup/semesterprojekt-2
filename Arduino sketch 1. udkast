@@ -1,61 +1,45 @@
-//I Arduino-programmet skal headerfilen SPI.h, inkluderes, for at kunne benytte SPI
-//porten. Dette gøres ved i starten af Arduino-programfilen at tilføje:
 #include <SPI.h>
-
-// Arduinoprogrammet skal der inkluderes en headerfil, for at kunne bruge de nye timermetoder. Øverst i
-//programfilen tilføjes:
 #include <TimerOne.h>
 
 // Der skal også oprettes et objekt, der specificerer SPI clock frekvensen og SPI mode:
 SPISettings settings(8000000, MSBFIRST, SPI_MODE0);
 
-//Endelig skal SPI porten klargøres (intialiseres). Dette gøres ved at tilføje følgende kodelinjer i setup()
-//funtionen:
-SPI.begin();
-SPI.beginTransaction(settings)
-; pinMode(10, OUTPUT);
-digitalWrite(10, HIGH);
+// Sample time i mikrosekunder
+// Der skal oprettes en global variabel, der specificerer samplingtiden:
+const long tSampleInMicros = 1000000; // 1000000 mikrosekunder for 1 kHz sampling rate
 
-// Sample time in microseconds
-//Der skal oprettes en global variabel, der specificerer samplingtiden:
-const long tSampleInMicros = 1000000; // 1000 ms for eksemplets skyld
-
-// Function to get EKG data from AD converter
+// Funktion der får EKG data fra AD-konvertern 
 int getEKGADC() {
     digitalWrite(10, LOW); // Start SPI transfer
     int adcValue = SPI.transfer16(0x00); // Transfer 16 bits
-    digitalWrite(10, HIGH); // End SPI transfer
+    digitalWrite(10, HIGH); // Stopper SPI overførelsen
     return adcValue;
 }
 
-// Function to measure and send EKG data
-//er skal laves en C-funktion, measureAndSend(), som laver en AD-konvertering (kalder den ovenfor
-//udviklede funktion getEKGADC(), og sender de målte data til PC’en.
-
+// Funktion til at læse og sende EKG data
+// Der skal laves en C-funktion, measureAndSend(), som laver en AD-konvertering (kalder den ovenfor
+// udviklede funktion getEKGADC(), og sender de målte data til PC’en.
 void measureAndSend() {
     int ekgValue = getEKGADC();
     Serial.println(ekgValue);
 }
 
 void setup() {
-  Timer1.initialize(tSampleInMicros); // initialize timer1, and set the period
-  Timer1.attachInterrupt(measureAndSend); // attaches callback() as a timer overflow
-  interrupt
-    // Initialize SPI
+    // Fastsætter Serial kommunikationen
+    // HUSK sættes til 115200 baud !
+    Serial.begin(115200);
+
+    // Fastsætter SPI
     SPI.begin();
     SPI.beginTransaction(settings);
     pinMode(10, OUTPUT);
     digitalWrite(10, HIGH);
 
-    // Initialize Serial communication
-    Serial.begin(115200);
-
-    // Initialize Timer1 for sampling
-    Timer1.initialize(tSampleInMicros);
-    Timer1.attachInterrupt(measureAndSend);
+    // Fastsætter Timer1 for sampling
+    Timer1.initialize(tSampleInMicros); // initialize timer1, and set the period
+    Timer1.attachInterrupt(measureAndSend); // attaches measureAndSend as a timer overflow interrupt
 }
 
 void loop() {
-    // Empty loop, all actions are done in interrupt
+    
 }
-
