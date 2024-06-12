@@ -15,18 +15,18 @@ def read_file(file_A, delimiter=',', chunk_size=100000):
     data = []
     with open(file_A, mode='r', newline='', encoding='utf-8') as file:
         reader = csv.reader(file, delimiter=delimiter)
-        chunk = []
+        List = []
         for i, row in enumerate(reader):
-            chunk.append(row)
+            List.append(row)
             if (i + 1) % chunk_size == 0:
-                data.extend(chunk)
-                chunk = []  # Clear the chunk to save memory
-        if chunk:  # Add the last chunk if it's not empty
-            data.extend(chunk)
+                data.extend(List)
+                List = []  # Clear the List to save memory
+        if List:  # Add the last List if it's not empty
+            data.extend(List)
     return data
 
 # Read the file
 data = read_file(file_A)
 # Print the first 10 rows
-for row in data[:10]:
+for row in data[:100]:
     print(row)
