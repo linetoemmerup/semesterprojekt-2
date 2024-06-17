@@ -12,40 +12,40 @@ def read_single_column_data(filename):
 
 
 # Read data from the file once
-# Testfil data.txt
-filename = '201m (0).txt'  # Replace with your filename
+# Testfile data.txt
+filename = '201m (0).txt'
 y_data = read_single_column_data(filename)
 
-# Initialize the plot and the text annotation
+# Initialize the plot
 fig, ax = plt.subplots()
 x, y = [], []
-line, = ax.plot(x, y, marker='o')
+line, = ax.plot(x, y)
 counter_text = ax.text(0.02, 0.95, '', transform=ax.transAxes, fontsize=12, verticalalignment='top')
 
 # Number of data points to display
 window_size = 300
 
 # Counter for data points above the threshold
-above_threshold_count = 0
+threshold_count = 0
 
 # Threshold value
 threshold = 0.006
 
 # Frame number when the count was last incremented
-last_increment_frame = 0
+last_increment = 0
 
 # Update function for animation
 def update(frame):
-    global above_threshold_count, last_increment_frame
+    global threshold_count, last_increment
 
     # Increment the counter if the current frame is above the threshold
     if frame < len(y_data) and y_data[frame] > threshold:
         # Check if the current frame is more than 50 frames away from the last increment frame
-        if frame - last_increment_frame >= 50:
-            above_threshold_count += 1
-            counter_text.set_text(f'Count: {above_threshold_count}')
-            print(f"Data point {frame}: {y_data[frame]} is above the threshold. Count: {above_threshold_count}")
-            last_increment_frame = frame
+        if frame - last_increment >= 50:
+            threshold_count += 1
+            counter_text.set_text(f'Count: {threshold_count}')
+            print(f"Data point {frame}: {y_data[frame]} is above the threshold. Count: {threshold_count}")
+            last_increment = frame
 
     # Update the plot with the current data point
     if frame < len(y_data):
